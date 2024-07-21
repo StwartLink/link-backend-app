@@ -1,0 +1,90 @@
+server:
+  port: 8080
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:5762/eureka
+  instance:
+    preferIpAddress: true
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway:
+            route:
+              RouteDefinitionRouteLocator: INFO
+    root: INFO
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+---
+spring:
+  application:
+    name: gateway
+  config:
+    activate:
+      on-profile:
+        - dev
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      routes:
+        - id: eureka-server
+          predicates:
+            - Path=/eureka/web
+          uri: http://localhost:5762
+
+        - id: eureka-server-static
+          predicates:
+            - Path=/eureka/**
+          uri: http://localhost:5762
+
+        - id: teste
+          predicates:
+            - Path=/teste/**
+          uri: http://localhost:8080
+
+        - id: openapi
+          uri: http://localhost:${server.port}
+          predicates:
+            - Path=/v3/api-docs/**
+          filters:
+            - RewritePath=/v3/api-docs/(?<path>.*), /$\{path}/v3/api-docs
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081/realms/agrobrasil
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+
+springdoc:
+  swagger-ui:
+    oauth:
+      clientId: microservices
+      clientSecret: bHSeHlkosWLI6JF0XdDudfgL243Yhhf2
+    oAuthFlow:
+      authorizationUrl: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/auth
+      tokenUrl: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/token
+    urls:
+      - name: link
+        url: /v3/api-docs/link
+      - name: viasoft
+        url: /v3/api-docs/viasoft
