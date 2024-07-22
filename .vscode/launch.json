@@ -19,6 +19,17 @@
       "mainClass": "br.com.linkagrotech.gateway.GatewayApplication",
       "projectName": "gateway",
       "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=55899 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=gateway"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-AuthServiceApplication<auth-service>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "br.com.linkagrotech.auth_service.AuthServiceApplication",
+      "projectName": "auth-service",
+      "args": "",
       "envFile": "${workspaceFolder}/.env"
     }
   ]

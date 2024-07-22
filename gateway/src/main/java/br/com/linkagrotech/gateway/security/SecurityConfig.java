@@ -2,7 +2,6 @@ package br.com.linkagrotech.gateway.security;
 
 import java.util.Arrays;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -30,6 +29,7 @@ public class SecurityConfig {
             .pathMatchers(HttpMethod.GET, "/webjars/swagger-ui/index.html").permitAll()
             .pathMatchers(HttpMethod.GET, "/swagger-resources/**").permitAll()
             .pathMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
+            .pathMatchers(HttpMethod.GET, "/auth/**").permitAll()
             .pathMatchers(HttpMethod.POST).authenticated()
             .pathMatchers(HttpMethod.PUT).authenticated()
             .pathMatchers(HttpMethod.DELETE).authenticated()

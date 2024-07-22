@@ -1,0 +1,28 @@
+server:
+  port: 0
+  servlet:
+    context-path: /auth
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:5762/eureka
+    register-with-eureka: true
+
+---
+spring:
+  application:
+    name: auth-service
+  jpa:
+    show-sql: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: jdbc:postgresql://localhost:5432/linkdb?createDatabaseIfNotExist=true
+    username: postgres
+    password: docker

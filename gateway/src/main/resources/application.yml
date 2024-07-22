@@ -1,5 +1,6 @@
 server:
   port: 8080
+  max-http-request-header-size: 32768
 eureka:
   client:
     serviceUrl:
@@ -28,10 +29,6 @@ management:
 spring:
   application:
     name: gateway
-  config:
-    activate:
-      on-profile:
-        - dev
   cloud:
     gateway:
       discovery:
@@ -48,10 +45,10 @@ spring:
             - Path=/eureka/**
           uri: http://localhost:5762
 
-        - id: teste
+        - id: auth-service
+          uri: lb://auth-service
           predicates:
-            - Path=/teste/**
-          uri: http://localhost:8080
+            - Path=/auth/**
 
         - id: openapi
           uri: http://localhost:${server.port}
@@ -84,7 +81,7 @@ springdoc:
       authorizationUrl: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/auth
       tokenUrl: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/token
     urls:
-      - name: link
-        url: /v3/api-docs/link
+      - name: auth
+        url: /v3/api-docs/auth
       - name: viasoft
         url: /v3/api-docs/viasoft
