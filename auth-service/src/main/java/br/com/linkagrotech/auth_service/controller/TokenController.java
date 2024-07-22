@@ -19,7 +19,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RestController
 public class TokenController {
 
-    @Operation(summary = "Request Token", description = "Login", security = @SecurityRequirement(name = "security_auth"))
+    @Operation(summary = "Request Token", description = "Login ", security = @SecurityRequirement(name = "security_auth"))
     @PostMapping("/")
     public ResponseEntity<String> token(@RequestBody User user) {
 
