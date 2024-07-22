@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 public class TokenController {
 
     @Operation(summary = "Request Token", description = "Login ", security = @SecurityRequirement(name = "security_auth"))
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<String> token(@RequestBody User user) {
 
         HttpHeaders headers = new HttpHeaders();

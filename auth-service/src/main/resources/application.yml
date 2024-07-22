@@ -1,5 +1,5 @@
 server:
-  port: 0
+  port: 5800
   servlet:
     context-path: /auth
 eureka:

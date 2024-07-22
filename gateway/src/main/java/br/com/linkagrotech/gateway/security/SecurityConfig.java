@@ -29,7 +29,7 @@ public class SecurityConfig {
             .pathMatchers(HttpMethod.GET, "/webjars/swagger-ui/index.html").permitAll()
             .pathMatchers(HttpMethod.GET, "/swagger-resources/**").permitAll()
             .pathMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
-            .pathMatchers(HttpMethod.GET, "/auth/**").permitAll()
+            .pathMatchers(HttpMethod.POST, "/auth/**").permitAll()
             .pathMatchers(HttpMethod.POST).authenticated()
             .pathMatchers(HttpMethod.PUT).authenticated()
             .pathMatchers(HttpMethod.DELETE).authenticated()
