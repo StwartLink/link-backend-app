@@ -26,3 +26,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/linkdb?createDatabaseIfNotExist=true
     username: postgres
     password: docker
+
+link-gateway-oauth:
+  issuer-uri: http://localhost:8081/realms/agrobrasil
+  clientId: microservices
+  clientSecret: Xpj2Rk966pp9PsjXQ5iXsV6PeBNpsomu

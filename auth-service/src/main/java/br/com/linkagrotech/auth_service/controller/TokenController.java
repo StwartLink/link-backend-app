@@ -1,5 +1,6 @@
 package br.com.linkagrotech.auth_service.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -22,23 +23,34 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TokenController {
 
+    @Value("${link-gateway-oauth.issuer-uri}")
+    private String issuerUri;
+
+    @Value("${link-gateway-oauth.clientId}")
+    private String clientId;
+
+    @Value("${link-gateway-oauth.clientSecret}")
+    private String clientSecret;
+
     @Operation(summary = "Request Token", description = "Login ", security = @SecurityRequirement(name = "security_auth"))
     @PostMapping("/token")
     public ResponseEntity<String> token(@RequestBody User user) {
+
         HttpHeaders headers = new HttpHeaders();
         RestTemplate rt = new RestTemplate();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-        formData.add("client_id", "microservices");
+        formData.add("client_id", clientId);
         formData.add("username", user.username());
         formData.add("password", user.password());
         formData.add("grant_type", "password");
+        formData.add("client_secret", clientSecret);
 
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(formData, headers);
 
         try {
-            var result = rt.postForEntity("http://localhost:8081/realms/agrobrasil/protocol/openid-connect/token",
+            var result = rt.postForEntity(issuerUri + "/protocol/openid-connect/token",
                     entity,
                     String.class);
             return result;

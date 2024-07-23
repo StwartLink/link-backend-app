@@ -76,7 +76,7 @@ springdoc:
   swagger-ui:
     oauth:
       clientId: microservices
-      clientSecret: bHSeHlkosWLI6JF0XdDudfgL243Yhhf2
+      clientSecret: Xpj2Rk966pp9PsjXQ5iXsV6PeBNpsomu
     oAuthFlow:
       authorizationUrl: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/auth
       tokenUrl: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/token
