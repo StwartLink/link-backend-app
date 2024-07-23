@@ -14,18 +14,7 @@ eureka:
 spring:
   application:
     name: auth-service
-  jpa:
-    show-sql: true
-    open-in-view: false
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-  datasource:
-    url: jdbc:postgresql://localhost:5432/linkdb?createDatabaseIfNotExist=true
-    username: postgres
-    password: docker
+
 
 link-gateway-oauth:
   issuer-uri: http://localhost:8081/realms/agrobrasil
