@@ -31,7 +31,7 @@ public class GerenciarUsuarioController {
     ServicoKeycloack servicoKeycloack;
 
     @PostMapping("/cadastrar")
-    public ResponseEntity cadastrar(@RequestBody @Nullable UsuarioCadastroRecord record){
+    public ResponseEntity<Object> cadastrar(@RequestBody @Nullable UsuarioCadastroRecord record){
 
         var usuarioSalvar = Usuario.builder()
                 .username(record.username())
@@ -80,17 +80,14 @@ public class GerenciarUsuarioController {
 
             servicoKeycloack.atualizarSenhaUsuario(userKeycloackUUID,record.password(),headers);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                    UsuarioCriadoRecord.builder()
-                            .username(usuarioSalvar.getUsername())
-                            .nome(usuarioSalvar.getNome())
-                            .sobrenome(usuarioSalvar.getSobrenome())
-                            .telefone(usuarioSalvar.getTelefone())
-                            .celular(usuarioSalvar.getCelular())
-                            .email(usuarioSalvar.getEmail())
-                            .id(usuarioSalvar.getId().toString())
-
-            );
+            return ResponseEntity.ok(UsuarioCriadoRecord.builder()
+                    .username(usuarioSalvar.getUsername())
+                    .nome(usuarioSalvar.getNome())
+                    .sobrenome(usuarioSalvar.getSobrenome())
+                    .telefone(usuarioSalvar.getTelefone())
+                    .celular(usuarioSalvar.getCelular())
+                    .email(usuarioSalvar.getEmail())
+                    .id(usuarioSalvar.getId().toString()).build());
         }catch (Exception e){
             usuarioRepositorio.delete(usuarioSalvar);
             if(uri!=null) {
@@ -104,7 +101,5 @@ public class GerenciarUsuarioController {
         }
 
     }
-
-
 
 }

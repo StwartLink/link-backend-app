@@ -1,15 +1,17 @@
 package br.com.linkagrotech.userservice.dto;
 
-import lombok.Builder;
+import lombok.*;
 
+@Data
 @Builder
-public record UsuarioCriadoRecord(
-        String id,
-        String username,
-        String nome,
-        String sobrenome,
-        String telefone,
-        String email,
-        String celular
-) {
+@NoArgsConstructor
+@AllArgsConstructor
+public class UsuarioCriadoRecord {
+    String id;
+    String username;
+    String nome;
+    String sobrenome;
+    String telefone;
+    String email;
+    String celular;
 }
