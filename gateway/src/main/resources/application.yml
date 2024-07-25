@@ -18,13 +18,20 @@ logging:
     root: INFO
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always    
   tracing:
+    enabled: true
     sampling:
       probability: 1.0
   zipkin:
     tracing:
-      endpoint: http://localhost:9411/api/v2/spans
-
+      endpoint: http://localhost:9411/api/v2/spans	
 ---
 spring:
   application:
@@ -50,6 +57,12 @@ spring:
           predicates:
             - Path=/auth/**
 
+        #- id: openapi-proxy
+        #  uri: http://backend-
+        #  predicates:
+        #    - Path=/demo-microservices/v3/api-docs/**
+        #  filters:
+        #    - RewritePath=/demo-microservices/v3/api-docs/(?<path>.*), /demo-microservices/$\{path}/v3/api-docs
         - id: openapi
           uri: http://localhost:${server.port}
           predicates:
@@ -64,24 +77,17 @@ spring:
           issuer-uri: http://localhost:8081/realms/agrobrasil
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
 
-management:
-  tracing:
-    sampling:
-      probability: 1.0
-  zipkin:
-    tracing:
-      endpoint: http://localhost:9411/api/v2/spans
+springdoc: 
+  cache: 
+   disabled: true
+  api-docs:
+   version: OPENAPI_3_1
 
-springdoc:
   swagger-ui:
+    use-root-path: true
     oauth:
       clientId: microservices
-      clientSecret: bHSeHlkosWLI6JF0XdDudfgL243Yhhf2
+      clientSecret: Xpj2Rk966pp9PsjXQ5iXsV6PeBNpsomu
     oAuthFlow:
       authorizationUrl: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/auth
       tokenUrl: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/token
-    urls:
-      - name: auth
-        url: /v3/api-docs/auth
-      - name: viasoft
-        url: /v3/api-docs/viasoft
