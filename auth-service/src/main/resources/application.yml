@@ -20,3 +20,4 @@ link-gateway-oauth:
   issuer-uri: http://localhost:8081/realms/agrobrasil
   clientId: microservices
   clientSecret: Xpj2Rk966pp9PsjXQ5iXsV6PeBNpsomu
+  keyloack-host: http://localhost:8081
