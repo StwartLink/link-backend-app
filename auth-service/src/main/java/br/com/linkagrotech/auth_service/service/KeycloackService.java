@@ -12,6 +12,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -59,7 +61,7 @@ public class KeycloackService {
     }
 
 
-    public Map[] getUsers(String email) throws Exception {
+    public String getUsers(String email) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(getToken());
@@ -68,27 +70,28 @@ public class KeycloackService {
 
         HttpEntity<String> request = new HttpEntity<>(headers);
 
-        ResponseEntity<Map[]> response = restTemplate.exchange(url, HttpMethod.GET, request, Map[].class);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, request, String.class);
 
-        return  response.getBody();
+        return response.getBody();
     }
 
     public boolean executeActionEmail(String userId) throws Exception {
         String token = getToken();
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(token);
 
-        URI uri = UriComponentsBuilder.fromHttpUrl(issuerUrl)
-                .path("/admin/realms/" + KEYCLOAK_REALM + "/users/" + userId + "/execute-actions-email")
-                .queryParam("redirect_uri", REDIRECT_URL)
-                .queryParam("client_id", KEYCLOAK_CLIENT_ID)
+        StringBuilder pathBuilder = new StringBuilder();
+
+        URI uri = UriComponentsBuilder.fromHttpUrl(keyloackHost)
+                .path(
+                        pathBuilder.append("/").append("admin").append("/").append("realms").append("/").append(KEYCLOAK_REALM)
+                                .append("/").append("users").append("/").append(userId).append("/").append("reset-password-email").toString()
+                )
                 .build()
                 .toUri();
 
-        String body = "[\"UPDATE_PASSWORD\"]";
-
-        HttpEntity<String> request = new HttpEntity<>(body, headers);
+        HttpEntity<String> request = new HttpEntity<>( headers);
 
         ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.PUT, request, String.class);
 

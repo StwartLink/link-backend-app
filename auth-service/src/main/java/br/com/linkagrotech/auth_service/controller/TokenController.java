@@ -2,7 +2,6 @@ package br.com.linkagrotech.auth_service.controller;
 
 import br.com.linkagrotech.auth_service.dto.ExcecaoDTO;
 import br.com.linkagrotech.auth_service.service.KeycloackService;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -21,7 +19,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicReference;
 
 @RequestMapping("/")
 @RestController
@@ -40,12 +40,26 @@ public class TokenController {
     @Autowired
     private KeycloackService keycloackService;
 
+
+
     @PostMapping("/enviar-email-recuperacao")
     public ResponseEntity<String> sendLinkResetPasswordEmail(@RequestBody SendEmailRecord record) throws Exception {
 
 
-        Map[] map = keycloackService.getUsers(record.email());
+        String listaString = keycloackService.getUsers(record.email());
 
+        AtomicReference<String> idUser = new AtomicReference<>("");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        LinkedList<LinkedHashMap> usuarios = objectMapper.readValue(listaString, LinkedList.class);
+
+        usuarios.forEach(user->{
+            if(user.get("email").toString().equals(record.email()))
+                idUser.set(user.get("id").toString());
+        });
+
+        keycloackService.executeActionEmail(idUser.get());
 
         return ResponseEntity.ok("");
     }
