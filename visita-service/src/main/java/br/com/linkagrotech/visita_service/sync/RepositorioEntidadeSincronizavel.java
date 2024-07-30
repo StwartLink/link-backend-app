@@ -1,9 +1,7 @@
 package br.com.linkagrotech.visita_service.sync;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.util.Date;

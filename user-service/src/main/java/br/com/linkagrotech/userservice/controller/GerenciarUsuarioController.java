@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 
@@ -39,7 +38,6 @@ public class GerenciarUsuarioController {
                 .telefone(record.telefone())
                 .celular(record.celular())
                 .nome(record.nome())
-                .sobrenome(record.sobrenome())
                 .build();
 
         if(usuarioRepositorio.existsByUsernameOrEmail(usuarioSalvar.getUsername(),usuarioSalvar.getEmail()))
@@ -83,7 +81,6 @@ public class GerenciarUsuarioController {
             return ResponseEntity.ok(UsuarioCriadoRecord.builder()
                     .username(usuarioSalvar.getUsername())
                     .nome(usuarioSalvar.getNome())
-                    .sobrenome(usuarioSalvar.getSobrenome())
                     .telefone(usuarioSalvar.getTelefone())
                     .celular(usuarioSalvar.getCelular())
                     .email(usuarioSalvar.getEmail())

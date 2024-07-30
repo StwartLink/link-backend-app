@@ -32,8 +32,6 @@ public class Usuario {
 
     private String nome;
 
-    private String sobrenome;
-
     @OneToMany(mappedBy = "usuario",fetch = FetchType.EAGER)
     private List<ReferenciaERP> referenciasERP;
 

@@ -20,13 +20,11 @@ public class VisitaController {
     @Autowired
     VisitaServico visitaServico;
 
-    @GetMapping("/puxar")
-    public ResponseEntity<List<Visita>> pullNovasVisitas(){
+    @GetMapping("/pull/{lastPulledAt}")
+    public ResponseEntity<List<Visita>> pullNovasVisitas(@PathVariable("lastPulledAt") Long lastPulledAt){
 
-        return ResponseEntity.ok(visitaServico.obterNovos(new Date().getTime()));
+        return ResponseEntity.ok(visitaServico.obterNovos(lastPulledAt));
 
     }
-
-    record PullOperacao(Long lastPulledAt){ }
 
 }
