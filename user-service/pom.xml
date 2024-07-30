@@ -8,9 +8,7 @@
 		<artifactId>link-backend-app</artifactId>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>br.com.linkagrotech</groupId>
 	<artifactId>user-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>user-service</name>
 	<description>user-service</description>
 	<url/>
@@ -59,7 +57,12 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+			<version>${springdoc-openapi.version}</version>
+		</dependency>
 		<!--  Security -->
 
 		<dependency>
