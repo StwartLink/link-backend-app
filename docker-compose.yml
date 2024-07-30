@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  eureka-server:
+    image: eureka-server:latest
+    container_name: eureka-server
+    build:
+      context: eureka-server
+      dockerfile: Dockerfile
+    ports:
+      - "5762:5762"
+    networks:
+      - spring-net
+    environment:
+      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
+      - EUREKA_CLIENT_FETCH_REGISTRY=false
+
+  gateway:
+    image: gateway:latest
+    container_name: gateway
+    build:
+      context: gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - spring-net
+    depends_on:
+      - eureka-server
+
+  auth-service:
+    image: auth-service:latest
+    container_name: auth-service
+    build:
+      context: auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "5800:5800"
+    networks:
+      - spring-net
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:5762/eureka/
+    depends_on:
+      - eureka-server
+
+  user-service:
+    image: user-service:latest
+    container_name: user-service
+    build:
+      context: user-service
+      dockerfile: Dockerfile
+    ports:
+      - "5801:5801"
+    networks:
+      - spring-net
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/user_service
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=docker
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:5762/eureka/
+      - SPRING_ZIPKIN_BASE_URL=http://zipkin:9411
+    depends_on:
+      - eureka-server
+      - postgres
+
+  postgres:
+    image: postgres:14
+    container_name: postgres-terra
+    ports:
+      - "5432:5432"
+    networks:
+      - spring-net
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - spring-net
+
+  keycloak:
+   image: quay.io/keycloak/keycloak:25.0.2
+   container_name: keycloak
+   ports:
+     - "8081:8080"
+   networks:
+     - spring-net
+   environment:
+     KEYCLOAK_ADMIN: admin
+     KEYCLOAK_ADMIN_PASSWORD: admin
+   command: start-dev	  
+
+volumes:
+  postgres_data:
+
+networks:
+  spring-net:

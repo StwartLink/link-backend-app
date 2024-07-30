@@ -3,11 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>br.com.linkagrotech</groupId>
-		<version>0.0.1-SNAPSHOT</version>
-		<artifactId>link-backend-app</artifactId>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+        <groupId>br.com.linkagrotech</groupId>
+        <artifactId>link-backend-app</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath> <!-- lookup parent from repository -->
+    </parent>
 	<artifactId>user-service</artifactId>
 	<name>user-service</name>
 	<description>user-service</description>

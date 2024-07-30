@@ -5,6 +5,7 @@ server:
 spring:
   application:
     name: eureka-server
+
 eureka:
   instance:
     hostname: 127.0.0.1
