@@ -31,6 +31,7 @@
 		<module>gateway</module>
 		<module>auth-service</module>
 		<module>user-service</module>
+		<module>visita-service</module>
 	</modules>
 
 	<dependencyManagement>

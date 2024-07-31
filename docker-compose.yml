@@ -69,6 +69,25 @@ services:
       - eureka-server
       - postgres
 
+  visita-service:
+    image: visita-service:latest
+    container_name: visita-service
+    build:
+      context: visita-service
+      dockerfile: Dockerfile
+    ports:
+      - "5803:5803"
+    networks:
+      - spring-net
+    environment:
+      <<: *shared-env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/visita_service
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: docker
+    depends_on:
+      - eureka-server
+      - postgres
+
   postgres:
     image: postgres:14
     container_name: postgres-terra
@@ -101,6 +120,8 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HTTP_ENABLED: true
     command: start-dev
 
 volumes:

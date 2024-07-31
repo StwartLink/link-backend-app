@@ -6,10 +6,9 @@
         <groupId>br.com.linkagrotech</groupId>
         <artifactId>link-backend-app</artifactId>
         <version>0.0.1-SNAPSHOT</version>
+         <relativePath>../pom.xml</relativePath> <!-- lookup parent from repository -->
     </parent>
-    <groupId>br.com.linkagrotech</groupId>
     <artifactId>visita-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
     <name>visita-service</name>
     <description>visita-service</description>
     <url/>
