@@ -1,5 +1,10 @@
 version: '3.8'
 
+x-shared-env:
+  &shared-env
+  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:5762/eureka
+  SPRING_ZIPKIN_BASE_URL: http://zipkin:9411/api/v2/spans
+  EUREKA_CLIENT_SERVICEURL_HOST: http://eureka-server:5762
 services:
   eureka-server:
     image: eureka-server:latest
@@ -27,6 +32,8 @@ services:
       - spring-net
     depends_on:
       - eureka-server
+    environment:
+      <<: *shared-env
 
   auth-service:
     image: auth-service:latest
@@ -39,7 +46,7 @@ services:
     networks:
       - spring-net
     environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:5762/eureka/
+      <<: *shared-env
     depends_on:
       - eureka-server
 
@@ -54,11 +61,10 @@ services:
     networks:
       - spring-net
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/user_service
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=docker
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:5762/eureka/
-      - SPRING_ZIPKIN_BASE_URL=http://zipkin:9411
+      <<: *shared-env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/user_service
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: docker
     depends_on:
       - eureka-server
       - postgres
@@ -86,16 +92,16 @@ services:
       - spring-net
 
   keycloak:
-   image: quay.io/keycloak/keycloak:25.0.2
-   container_name: keycloak
-   ports:
-     - "8081:8080"
-   networks:
-     - spring-net
-   environment:
-     KEYCLOAK_ADMIN: admin
-     KEYCLOAK_ADMIN_PASSWORD: admin
-   command: start-dev	  
+    image: quay.io/keycloak/keycloak:25.0.2
+    container_name: keycloak
+    ports:
+      - "8081:8080"
+    networks:
+      - spring-net
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: start-dev
 
 volumes:
   postgres_data:
