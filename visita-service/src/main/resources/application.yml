@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: visita-service
+  jpa:
+    show-sql: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: jdbc:postgresql://localhost:5432/visita_service
+    username: postgres
+    password: docker
+
+server:
+  port: 5803
+  servlet:
+    context-path: /visita
+
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:5762/eureka
+    register-with-eureka: true
+
+
+

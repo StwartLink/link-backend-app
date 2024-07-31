@@ -62,6 +62,11 @@ spring:
           predicates:
             - Path=/user/**
 
+        - id: visita-service
+          uri: lb://visita-service
+          predicates:
+            - Path=/visita/**
+
         - id: openapi
           uri: http://localhost:${server.port}
           predicates:
