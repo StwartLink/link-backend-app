@@ -78,7 +78,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8081/realms/agrobrasil
+          issuer-uri: ${KEYCLOAK_ISSUER:http://localhost:8081/realms/agrobrasil}
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
 
 springdoc:

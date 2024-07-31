@@ -34,6 +34,7 @@ services:
       - eureka-server
     environment:
       <<: *shared-env
+      KEYCLOAK_ISSUER: http://keycloak:8081/realms/agrobrasil
 
   auth-service:
     image: auth-service:latest

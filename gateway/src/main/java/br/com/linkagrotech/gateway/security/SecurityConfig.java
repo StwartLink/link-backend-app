@@ -2,6 +2,7 @@ package br.com.linkagrotech.gateway.security;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,7 +21,8 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-    private String issuerUri = "http://localhost:8081/realms/agrobrasil";
+    @Value("${KEYCLOAK_ISSUER:http://localhost:8081/realms/agrobrasil}")
+    private String issuerUri;
 
     @Bean
     SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
