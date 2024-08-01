@@ -117,9 +117,6 @@ services:
       - spring-net
 
   keycloak:
-    build:
-      context: ./keycloak
-      dockerfile: Dockerfile
     image: quay.io/keycloak/keycloak:25.0.2
     container_name: keycloak
     ports:
@@ -131,8 +128,10 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HOSTNAME_STRICT_HTTPS: false
-      KC_HTTP_ENABLED: true
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+    command: ["start-dev"]
+
 
 volumes:
   postgres_data:

@@ -40,5 +40,5 @@ springdoc:
 link-gateway-oauth:
   issuer-uri: ${KEYCLOAK_ISSUER:http://localhost:8081/realms/agrobrasil}
   clientId: microservices
-  clientSecret: Xpj2Rk966pp9PsjXQ5iXsV6PeBNpsomu
+  clientSecret: soFh1RbL9qbWud3IHE0ox8Cxl3YZZc3K
   keyloack-host: ${KEYCLOAK_HOST:http://localhost:8081}
