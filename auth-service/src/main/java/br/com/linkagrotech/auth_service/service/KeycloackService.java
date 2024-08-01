@@ -61,7 +61,7 @@ public class KeycloackService {
     }
 
 
-    public String getUsers(String email) throws Exception {
+    public String getUsers() throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         headers.setBearerAuth(getToken());

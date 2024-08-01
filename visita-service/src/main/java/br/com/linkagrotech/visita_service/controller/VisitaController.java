@@ -1,16 +1,16 @@
 package br.com.linkagrotech.visita_service.controller;
 
 import br.com.linkagrotech.visita_service.model.Visita;
-import br.com.linkagrotech.visita_service.repository.VisitaRepositorio;
 import br.com.linkagrotech.visita_service.servico.VisitaServico;
-import br.com.linkagrotech.visita_service.sync.EntidadeSincronizavel;
-import jakarta.ws.rs.PathParam;
+import br.com.linkagrotech.visita_service.sync.Changes;
+import br.com.linkagrotech.visita_service.sync.PullRequestRecord;
+import br.com.linkagrotech.visita_service.sync.PullResponseRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -20,11 +20,17 @@ public class VisitaController {
     @Autowired
     VisitaServico visitaServico;
 
-    @GetMapping("/pull/{lastPulledAt}")
-    public ResponseEntity<List<Visita>> pullNovasVisitas(@PathVariable("lastPulledAt") Long lastPulledAt){
+    @PostMapping("/pull")
+    public ResponseEntity<PullResponseRecord> pullNovasVisitas(@RequestBody PullRequestRecord pullRequest){
 
-        return ResponseEntity.ok(visitaServico.obterNovos(lastPulledAt));
+        PullResponseRecord pullResponseRecord = new PullResponseRecord();
 
+        pullResponseRecord.setTimestamp(new Date().getTime());
+
+        pullResponseRecord.setChanges(new Changes(Map.of(Visita.TABLE_NAME,visitaServico.pull(pullRequest))));
+
+        return ResponseEntity.ok(pullResponseRecord);
     }
+
 
 }

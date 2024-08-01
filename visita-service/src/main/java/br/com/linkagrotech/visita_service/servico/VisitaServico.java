@@ -1,21 +1,17 @@
 package br.com.linkagrotech.visita_service.servico;
 
 import br.com.linkagrotech.visita_service.model.Visita;
-import br.com.linkagrotech.visita_service.sync.RepositorioEntidadeSincronizavel;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.linkagrotech.visita_service.repository.VisitaRepositorio;
+import br.com.linkagrotech.visita_service.sync.ServicoEntidadeSincronizavel;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-
 @Service
-public class VisitaServico{
+public class VisitaServico extends ServicoEntidadeSincronizavel<Visita,Long> {
 
-    @Autowired
-    RepositorioEntidadeSincronizavel<Visita,Long> repositorioEntidadeSincronizavel;
+    VisitaRepositorio visitaRepositorio;
 
-    public List<Visita> obterNovos(Long lastPulledAt){
-        return repositorioEntidadeSincronizavel.findByCreatedAtGreaterThan(new Date(lastPulledAt));
+    public VisitaServico(VisitaRepositorio visitaRepositorio) {
+        super(visitaRepositorio);
+        this.visitaRepositorio = visitaRepositorio;
     }
-
 }
