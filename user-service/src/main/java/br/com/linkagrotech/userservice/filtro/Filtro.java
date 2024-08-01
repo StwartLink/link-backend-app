@@ -1,8 +1,9 @@
 package br.com.linkagrotech.userservice.filtro;
 
 
+import br.com.linkagrotech.userservice.config.SecurityConfig;
+import br.com.linkagrotech.userservice.dto.ExcecaoDTO;
 import br.com.linkagrotech.userservice.dto.UsuarioRecord;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jwt.JWT;
@@ -16,13 +17,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.net.http.HttpRequest;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 
@@ -32,6 +32,12 @@ public class Filtro extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        if(new AntPathRequestMatcher(SecurityConfig.PUBLIC_MATCHER).matches(request)){
+            filterChain.doFilter(request,response);
+            return;
+        }
+
         try{
             String authorization = obterJWT(request);
 
@@ -67,7 +73,7 @@ public class Filtro extends OncePerRequestFilter {
         }catch (Exception e){
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setHeader("Content-type","application/json");
-//            response.getWriter().write(convertObjectToJson(new ExcecaoDTO(e)));
+            response.getWriter().write( new ObjectMapper().writeValueAsString(new ExcecaoDTO(e)));
         }
 
     }

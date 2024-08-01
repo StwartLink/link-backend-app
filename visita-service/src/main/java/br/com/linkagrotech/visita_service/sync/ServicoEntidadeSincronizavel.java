@@ -25,6 +25,10 @@ public abstract class ServicoEntidadeSincronizavel<T extends EntidadeSincronizav
         return repositorioEntidadeSincronizavel.findByUpdatedAtGreaterThan(new Date(lastPulledAt));
     }
 
+    private List<String> obterDeletedSince(Long lastPulledAt) {
+        return repositorioEntidadeSincronizavel.findIdByUpdatedAtGreaterThan(new Date(lastPulledAt)).stream().map(String::valueOf).toList();
+    }
+
     public Change<T> pull(PullRequestRecord pullRequest) {
 
         Change<T> change = new Change<>();
@@ -43,9 +47,7 @@ public abstract class ServicoEntidadeSincronizavel<T extends EntidadeSincronizav
         return  change;
     }
 
-    private List<String> obterDeletedSince(Long lastPulledAt) {
-        return repositorioEntidadeSincronizavel.findIdByUpdated_At(new Date(lastPulledAt)).stream().map(String::valueOf).toList();
-    }
+
 
 
 }

@@ -16,13 +16,14 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-
 @Configuration
 public class SecurityConfig {
 
     @Autowired
     Filtro filtro;
+
+    public static final String PUBLIC_MATCHER = "/publico/**";
+    public static final String PUBLIC_PATH = "/publico";
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -34,7 +35,7 @@ public class SecurityConfig {
                 })
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(it -> {
-                    it.requestMatchers(HttpMethod.POST,"/cadastrar").permitAll();
+                    it.requestMatchers(HttpMethod.POST, PUBLIC_MATCHER).permitAll();
                     it.anyRequest().authenticated();
                 })
                 .addFilterBefore(filtro, UsernamePasswordAuthenticationFilter.class)

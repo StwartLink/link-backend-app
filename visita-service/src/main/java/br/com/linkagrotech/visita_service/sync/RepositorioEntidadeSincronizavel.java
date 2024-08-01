@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -14,5 +15,5 @@ public interface RepositorioEntidadeSincronizavel<T extends EntidadeSincronizave
 
     List<T> findByUpdatedAtGreaterThan(Date lastPulledAt);
 
-    List<Long> findIdByUpdated_At(Date date);
+    List<Long>  findIdByUpdatedAtGreaterThan(Date date);
 }

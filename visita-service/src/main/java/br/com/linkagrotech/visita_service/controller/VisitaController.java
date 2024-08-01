@@ -25,11 +25,15 @@ public class VisitaController {
 
         PullResponseRecord pullResponseRecord = new PullResponseRecord();
 
-        pullResponseRecord.setTimestamp(new Date().getTime());
+        pullResponseRecord.setTimestamp(now());
 
         pullResponseRecord.setChanges(new Changes(Map.of(Visita.TABLE_NAME,visitaServico.pull(pullRequest))));
 
         return ResponseEntity.ok(pullResponseRecord);
+    }
+
+    private long now(){
+        return new Date().getTime();
     }
 
 

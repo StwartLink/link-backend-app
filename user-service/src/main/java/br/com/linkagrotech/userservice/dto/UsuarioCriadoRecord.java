@@ -10,7 +10,6 @@ public class UsuarioCriadoRecord {
     String id;
     String username;
     String nome;
-    String sobrenome;
     String telefone;
     String email;
     String celular;

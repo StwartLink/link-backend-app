@@ -66,12 +66,15 @@ public class ServicoKeycloack {
 
         RestTemplate restTemplate = new RestTemplate();
 
+        String firstName = record.getNome().split(" ")[0];
+        String lastname = record.getNome().replace(firstName,"");
+
         var responseEntity = restTemplate.postForEntity("http://localhost:8081/admin/realms/agrobrasil/users",
                 new HttpEntity<>(UsuarioNovoKeycloak.builder()
-                        .username(record.username())
-                        .email(record.email())
-                        .firstName(record.nome())
-                        .lastName(record.sobrenome())
+                        .username(record.getUsername())
+                        .email(record.getEmail())
+                        .firstName(firstName)
+                        .lastName(lastname)
                         .enabled(true)
                         .build(),headers),String.class);
         if(responseEntity.getStatusCode()!=HttpStatus.CREATED)

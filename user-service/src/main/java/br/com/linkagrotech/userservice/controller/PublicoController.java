@@ -1,17 +1,17 @@
 package br.com.linkagrotech.userservice.controller;
 
+import br.com.linkagrotech.userservice.config.SecurityConfig;
 import br.com.linkagrotech.userservice.dto.UsuarioCriadoRecord;
 import br.com.linkagrotech.userservice.service.ServicoKeycloack;
 import br.com.linkagrotech.userservice.dto.ExcecaoDTO;
 import br.com.linkagrotech.userservice.dto.UsuarioCadastroRecord;
-import br.com.linkagrotech.userservice.dto.UsuarioNovoKeycloak;
 import br.com.linkagrotech.userservice.modelo.Usuario;
 import br.com.linkagrotech.userservice.repository.UsuarioRepositorio;
 import brave.internal.Nullable;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 
 @RestController()
-@RequestMapping("/gerenciar")
-public class GerenciarUsuarioController {
+@RequestMapping(SecurityConfig.PUBLIC_PATH)
+public class PublicoController {
 
     @Autowired
     UsuarioRepositorio usuarioRepositorio;
@@ -30,15 +30,16 @@ public class GerenciarUsuarioController {
     ServicoKeycloack servicoKeycloack;
 
     @PostMapping("/cadastrar")
-    public ResponseEntity<Object> cadastrar(@RequestBody @Nullable UsuarioCadastroRecord record){
+    public ResponseEntity<Object> cadastrar(@RequestBody @Validated UsuarioCadastroRecord record){
 
         var usuarioSalvar = Usuario.builder()
-                .username(record.username())
-                .email(record.email())
-                .telefone(record.telefone())
-                .celular(record.celular())
-                .nome(record.nome())
+                .username(record.getUsername())
+                .email(record.getEmail())
+                .telefone(record.getTelefone())
+                .celular(record.getCelular())
+                .nome(record.getNome())
                 .build();
+
 
         if(usuarioRepositorio.existsByUsernameOrEmail(usuarioSalvar.getUsername(),usuarioSalvar.getEmail()))
             return ResponseEntity.badRequest().body(new ExcecaoDTO("Usuário já cadastrado!","Username ou email já existente"));
@@ -76,7 +77,7 @@ public class GerenciarUsuarioController {
 
             String userKeycloackUUID= parts[parts.length-1];
 
-            servicoKeycloack.atualizarSenhaUsuario(userKeycloackUUID,record.password(),headers);
+            servicoKeycloack.atualizarSenhaUsuario(userKeycloackUUID,record.getPassword(),headers);
 
             return ResponseEntity.ok(UsuarioCriadoRecord.builder()
                     .username(usuarioSalvar.getUsername())
