@@ -31,6 +31,7 @@
 		<module>gateway</module>
 		<module>auth-service</module>
 		<module>user-service</module>
+		<module>visita-service</module>
 	</modules>
 
 	<dependencyManagement>
@@ -59,7 +60,7 @@
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
-		<!-- <dependency>
+		<!--<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-docker-compose</artifactId>
             <scope>runtime</scope>

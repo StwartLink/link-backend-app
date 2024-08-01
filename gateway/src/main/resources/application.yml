@@ -4,7 +4,7 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://127.0.0.1:5762/eureka
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://127.0.0.1:5762/eureka/}
   instance:
     preferIpAddress: true
 logging:
@@ -31,9 +31,8 @@ management:
       probability: 1.0
   zipkin:
     tracing:
-      endpoint: http://localhost:9411/api/v2/spans
+      endpoint: ${SPRING_ZIPKIN_BASE_URL:http://localhost:9411/api/v2/spans}
 
----
 spring:
   application:
     name: gateway
@@ -46,12 +45,12 @@ spring:
         - id: eureka-server
           predicates:
             - Path=/eureka/web
-          uri: http://localhost:5762
+          uri: ${EUREKA_CLIENT_SERVICEURL_HOST:http://localhost:5762}
 
         - id: eureka-server-static
           predicates:
             - Path=/eureka/**
-          uri: http://localhost:5762
+          uri: ${EUREKA_CLIENT_SERVICEURL_HOST:http://localhost:5762}
 
         - id: auth-service
           uri: lb://auth-service
@@ -79,16 +78,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8081/realms/agrobrasil
+          issuer-uri: ${KEYCLOAK_ISSUER:http://localhost:8081/realms/agrobrasil}
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
-
-management:
-  tracing:
-    sampling:
-      probability: 1.0
-  zipkin:
-    tracing:
-      endpoint: http://localhost:9411/api/v2/spans
 
 springdoc:
   swagger-ui:
