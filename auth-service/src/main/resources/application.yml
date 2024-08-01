@@ -1,5 +1,6 @@
 server:
   port: 5800
+  forward-headers-strategy: framework
   servlet:
     context-path: /auth
 eureka:
@@ -30,9 +31,14 @@ spring:
   application:
     name: auth-service
 
+springdoc:
+  api-docs:
+    version: OPENAPI_3_1
+  cache:
+    disabled: true
 
 link-gateway-oauth:
-  issuer-uri: http://localhost:8081/realms/agrobrasil
+  issuer-uri: ${KEYCLOAK_ISSUER:http://localhost:8081/realms/agrobrasil}
   clientId: microservices
   clientSecret: Xpj2Rk966pp9PsjXQ5iXsV6PeBNpsomu
-  keyloack-host: http://localhost:8081
+  keyloack-host: ${KEYCLOAK_HOST:http://localhost:8081}

@@ -16,6 +16,7 @@ spring:
 
 server:
   port: 5801
+  forward-headers-strategy: framework
   servlet:
     context-path: /user
 
@@ -43,3 +44,9 @@ management:
   zipkin:
     tracing:
       endpoint: ${SPRING_ZIPKIN_BASE_URL:http://localhost:9411/api/v2/spans}
+
+springdoc:
+  api-docs:
+    version: OPENAPI_3_1
+  cache:
+    disabled: true
