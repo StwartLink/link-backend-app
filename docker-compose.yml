@@ -5,6 +5,8 @@ x-shared-env:
   EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:5762/eureka
   SPRING_ZIPKIN_BASE_URL: http://zipkin:9411/api/v2/spans
   EUREKA_CLIENT_SERVICEURL_HOST: http://eureka-server:5762
+  KEYCLOAK_HOST: http://keycloak:8080
+  KEYCLOAK_ISSUER: http://keycloak:8080/realms/agrobrasil
 services:
   eureka-server:
     image: eureka-server:latest
@@ -32,9 +34,10 @@ services:
       - spring-net
     depends_on:
       - eureka-server
+      - keycloak
     environment:
       <<: *shared-env
-      KEYCLOAK_ISSUER: http://keycloak:8081/realms/agrobrasil
+    entrypoint: ["/bin/sh", "-c", "sleep 05 && exec java -jar /gateway.jar"]
 
   auth-service:
     image: auth-service:latest
@@ -50,6 +53,8 @@ services:
       <<: *shared-env
     depends_on:
       - eureka-server
+      - postgres
+      - keycloak
 
   user-service:
     image: user-service:latest
@@ -112,21 +117,26 @@ services:
       - spring-net
 
   keycloak:
+    build:
+      context: ./keycloak
+      dockerfile: Dockerfile
     image: quay.io/keycloak/keycloak:25.0.2
     container_name: keycloak
     ports:
       - "8081:8080"
     networks:
       - spring-net
+    volumes:
+      - keycloak_data:/opt/keycloak/data
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HOSTNAME_STRICT_HTTPS: false
       KC_HTTP_ENABLED: true
-    command: start-dev
-
+  
 volumes:
   postgres_data:
+  keycloak_data:
 
 networks:
   spring-net:

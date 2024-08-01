@@ -1,5 +1,6 @@
 server:
   port: 8080
+  forward-headers-strategy: framework
   max-http-request-header-size: 32768
 eureka:
   client:
@@ -38,6 +39,9 @@ spring:
     name: gateway
   cloud:
     gateway:
+      httpclient:
+        ssl:
+          useInsecureTrustManager: true
       discovery:
         locator:
           enabled: true
@@ -83,14 +87,14 @@ spring:
 
 springdoc:
   swagger-ui:
+    use-root-path: true
     oauth:
       clientId: microservices
       clientSecret: Xpj2Rk966pp9PsjXQ5iXsV6PeBNpsomu
     oAuthFlow:
       authorizationUrl: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/auth
       tokenUrl: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/token
-    urls:
-      - name: auth
-        url: /v3/api-docs/auth
-      - name: viasoft
-        url: /v3/api-docs/viasoft
+  cache:
+    disabled: true
+  api-docs:
+    version: OPENAPI_3_1

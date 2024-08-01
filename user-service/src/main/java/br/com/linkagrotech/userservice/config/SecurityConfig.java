@@ -1,6 +1,5 @@
 package br.com.linkagrotech.userservice.config;
 
-import br.com.linkagrotech.userservice.filtro.Filtro;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +14,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import br.com.linkagrotech.userservice.filtro.Filtro;
 
 @Configuration
 public class SecurityConfig {
@@ -26,34 +25,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
-        return httpSecurity
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(c -> {
-                    c.configurationSource(corsConfigurationSource());
-                })
-                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(it -> it.anyRequest().authenticated())
-                .addFilterBefore(filtro, UsernamePasswordAuthenticationFilter.class)
-                .build();
+	return httpSecurity.csrf(AbstractHttpConfigurer::disable).cors(c -> {
+	    c.configurationSource(corsConfigurationSource());
+	}).sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+		.authorizeHttpRequests(it -> it.anyRequest().authenticated())
+		.addFilterBefore(filtro, UsernamePasswordAuthenticationFilter.class).build();
 
     }
 
     CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.applyPermitDefaultValues();
-        // getaway
-        corsConfig.addAllowedOrigin("http://localhost:8080");
-        corsConfig.addAllowedHeader("*");
-        corsConfig.addAllowedMethod("*");
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfig);
-        return source;
+	CorsConfiguration corsConfig = new CorsConfiguration();
+	corsConfig.applyPermitDefaultValues();
+	// getaway
+	corsConfig.addAllowedOrigin("http://localhost:8080");
+	corsConfig.addAllowedHeader("*");
+	corsConfig.addAllowedMethod("*");
+	UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	source.registerCorsConfiguration("/**", corsConfig);
+	return source;
     }
-
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration conf) throws Exception {
-        return conf.getAuthenticationManager();
+	return conf.getAuthenticationManager();
     }
 
 }
