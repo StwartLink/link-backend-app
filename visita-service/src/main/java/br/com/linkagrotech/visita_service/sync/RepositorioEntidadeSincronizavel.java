@@ -12,5 +12,7 @@ public interface RepositorioEntidadeSincronizavel<T extends EntidadeSincronizave
 
     List<T> findByCreatedAtGreaterThan(Date lastPulledAt);
 
+    List<T> findByUpdatedAtGreaterThan(Date lastPulledAt);
 
+    List<Long> findIdByUpdated_At(Date date);
 }

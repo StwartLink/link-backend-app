@@ -30,6 +30,7 @@ public class SecurityConfig {
             .pathMatchers(HttpMethod.GET, "/swagger-resources/**").permitAll()
             .pathMatchers(HttpMethod.GET, "/v3/api-docs/**").permitAll()
             .pathMatchers(HttpMethod.POST, "/auth/**").permitAll()
+            .pathMatchers(HttpMethod.POST,"/user/cadastrar").permitAll()
             .pathMatchers(HttpMethod.POST).authenticated()
             .pathMatchers(HttpMethod.PUT).authenticated()
             .pathMatchers(HttpMethod.DELETE).authenticated()

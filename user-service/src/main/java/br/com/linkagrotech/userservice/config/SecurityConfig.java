@@ -4,6 +4,7 @@ import br.com.linkagrotech.userservice.filtro.Filtro;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -32,7 +33,10 @@ public class SecurityConfig {
                     c.configurationSource(corsConfigurationSource());
                 })
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(it -> it.anyRequest().authenticated())
+                .authorizeHttpRequests(it -> {
+                    it.requestMatchers(HttpMethod.POST,"/cadastrar").permitAll();
+                    it.anyRequest().authenticated();
+                })
                 .addFilterBefore(filtro, UsernamePasswordAuthenticationFilter.class)
                 .build();
 

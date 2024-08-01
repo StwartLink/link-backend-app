@@ -41,12 +41,11 @@ public class TokenController {
     private KeycloackService keycloackService;
 
 
-
     @PostMapping("/enviar-email-recuperacao")
     public ResponseEntity<String> sendLinkResetPasswordEmail(@RequestBody SendEmailRecord record) throws Exception {
 
 
-        String listaString = keycloackService.getUsers(record.email());
+        String listaString = keycloackService.getUsers();
 
         AtomicReference<String> idUser = new AtomicReference<>("");
 
@@ -55,7 +54,7 @@ public class TokenController {
         LinkedList<LinkedHashMap> usuarios = objectMapper.readValue(listaString, LinkedList.class);
 
         usuarios.forEach(user->{
-            if(user.get("email").toString().equals(record.email()))
+            if(user.get("username").toString().equals(record.username()))
                 idUser.set(user.get("id").toString());
         });
 
@@ -133,6 +132,6 @@ public class TokenController {
 
     public record RefreshTokenRecord(String refreshToken){}
 
-    public record SendEmailRecord(String email){}
+    public record SendEmailRecord(String username){}
 
 }
