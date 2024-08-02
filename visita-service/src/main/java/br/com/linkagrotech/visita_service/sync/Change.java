@@ -5,11 +5,11 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Change<T extends EntidadeSincronizavel> {
+public class Change {
 
-    List<T> created;
+    List<EntidadeSincronizavel> created;
 
-    List<T> updated;
+    List<EntidadeSincronizavel> updated;
 
     List<String> deleted;
 

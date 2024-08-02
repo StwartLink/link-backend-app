@@ -7,20 +7,19 @@ import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
-@Data
 @NoArgsConstructor
-public class Changes<T extends EntidadeSincronizavel> {
+public class Changes {
 
-    private Map<String,Change<T>> tableChanges;
+    public Map<String,Change> tableChanges;
 
-    public Changes(Map.Entry<String,Change<T>> tableChanges){
+    public Changes(Map.Entry<String,Change> tableChanges){
         this.tableChanges = Map.ofEntries(tableChanges);
     }
 
 
     @SafeVarargs
-    public static <T extends EntidadeSincronizavel> Changes<T> of(Map.Entry<String,Change<T>>... tableChanges){
-        Changes<T> changes = new Changes<>();
+    public static  Changes of(Map.Entry<String,Change>... tableChanges){
+        Changes changes = new Changes();
         changes.tableChanges = Map.ofEntries(tableChanges);
         return changes;
     }

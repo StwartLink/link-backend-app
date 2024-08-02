@@ -4,55 +4,32 @@ package br.com.linkagrotech.visita_service.sync;
 
 import br.com.linkagrotech.visita_service.model.Visita;
 import br.com.linkagrotech.visita_service.sync.repositorio.RepositorioEntidadeSincronizavel;
-import jakarta.persistence.Entity;
+import br.com.linkagrotech.visita_service.sync.util.SyncUtil;
 
-import java.io.Serializable;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
-public abstract class ServicoEntidadeSincronizavel<T extends EntidadeSincronizavel, ID extends Serializable> {
+public abstract class ServicoEntidadeSincronizavel {
 
-    RepositorioEntidadeSincronizavel<T,ID> repositorioEntidadeSincronizavel;
 
-    public ServicoEntidadeSincronizavel(RepositorioEntidadeSincronizavel<T,ID>  repositorioEntidadeSincronizavel){
+    public Map.Entry<String,Change> pullEntities(PullRequestObject pullRequest,Class<? extends EntidadeSincronizavel> clazz) {
 
-        this.repositorioEntidadeSincronizavel = repositorioEntidadeSincronizavel;
+        String tableName = SyncUtil.obterTableNameFromEntity(clazz);
 
-    }
-
-    private List<T> obterCreatedSince(Long lastPulledAt){
-        return repositorioEntidadeSincronizavel.findByCreatedAtGreaterThan(new Date(lastPulledAt));
-    }
-
-    private List<T> obterUpdatedSince(Long lastPulledAt) {
-        return repositorioEntidadeSincronizavel.findByUpdatedAtGreaterThan(new Date(lastPulledAt));
-    }
-
-    private List<String> obterDeletedSince(Long lastPulledAt) {
-        return repositorioEntidadeSincronizavel.findByDeletedAtGreaterThan(new Date(lastPulledAt)).stream().map(t->
-                String.valueOf(t.getId())).toList();
-    }
-
-    public Map.Entry<String,Change<T>> pull(PullRequestObject pullRequest) {
-
-        Change<T> change = new Change<>();
+        Change change = new Change();
 
         if(pullRequest.lastPulledAt==null || pullRequest.lastPulledAt==0){
-            change.created = this.repositorioEntidadeSincronizavel.findAll();
+            change.created = this.repositorioSincronizavel().obterTodos(clazz);
             change.updated = Collections.emptyList();
             change.deleted = Collections.emptyList();
-            return Map.entry(getTableName(),change);
+            return Map.entry(tableName,change);
         }
 
-        change.created = this.obterCreatedSince(pullRequest.lastPulledAt);
-        change.updated = this.obterUpdatedSince(pullRequest.lastPulledAt);
-        change.deleted = this.obterDeletedSince(pullRequest.lastPulledAt);
+        change.created = repositorioSincronizavel().obterCreatedSince(pullRequest.lastPulledAt, clazz);
+        change.updated = repositorioSincronizavel().obterUpdatedSince(pullRequest.lastPulledAt,clazz);
+        change.deleted = repositorioSincronizavel().obterDeletedSince(pullRequest.lastPulledAt,clazz);
 
-        return  Map.entry(getTableName(),change);
+        return  Map.entry(tableName,change);
     }
 
     public void verifySchemaCompatibility(Long clientSchema) throws RuntimeException {
@@ -63,37 +40,20 @@ public abstract class ServicoEntidadeSincronizavel<T extends EntidadeSincronizav
 
     }
 
-    public void push(Changes<T> changes) {
+    public void pushEntities(Changes changes, Class<Visita> clazz) {
+        var change = changes.tableChanges.get(SyncUtil.obterTableNameFromEntity(clazz));
+
+        if(change==null)
+            throw new IllegalArgumentException("Não vinheram alterações da tabela: "+ SyncUtil.obterTableNameFromEntity(clazz));
+
+        var createds = change.created;
+
+        repositorioSincronizavel().salvarNovosAtualizarVelhos(createds, clazz);
 
 
     }
 
-    private String getTableName() {
-        Type genericSuperclass = this.getClass().getGenericSuperclass();
+    protected abstract RepositorioEntidadeSincronizavel repositorioSincronizavel();
 
-        if (genericSuperclass instanceof ParameterizedType parameterizedType) {
-
-            Type[] typeArguments = parameterizedType.getActualTypeArguments();
-
-            Type entityType = typeArguments[0];
-
-            if (entityType instanceof Class<?> entityClass && (entityClass.isAnnotationPresent(Entity.class))) {
-
-                    Entity entityAnnotation = entityClass.getAnnotation(Entity.class);
-
-                    String entityName = entityAnnotation.name();
-
-                    if (entityName.isEmpty()) {
-                        entityName = entityClass.getSimpleName();
-                    }
-
-                    return entityName;
-
-            }
-
-        }
-
-        return "entity"; // Retorne entity se não conseguir obter o nome da entidade
-    }
 
 }

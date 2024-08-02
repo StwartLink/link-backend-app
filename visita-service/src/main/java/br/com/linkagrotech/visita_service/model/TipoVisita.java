@@ -7,6 +7,7 @@ import lombok.Data;
 
 @Entity(name = "tipo_visita")
 @Data
+
 public class TipoVisita {
 
     @Id
