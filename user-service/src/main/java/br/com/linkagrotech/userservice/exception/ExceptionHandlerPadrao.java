@@ -1,6 +1,5 @@
-package br.com.linkagrotech.userservice.config;
+package br.com.linkagrotech.userservice.exception;
 
-import br.com.linkagrotech.userservice.dto.ExcecaoDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;

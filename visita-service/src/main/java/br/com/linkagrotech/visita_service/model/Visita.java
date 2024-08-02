@@ -6,16 +6,16 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity(name = Visita.TABLE_NAME)
+@Entity(name = "visita")
 @Data
 public class Visita extends EntidadeSincronizavel {
 
-    public static final String TABLE_NAME = "visita";
+    public static final int SCHEMA_VERSION = 1;
 
     @OneToOne
-    TipoVisita tipoVisita;
+    private TipoVisita tipoVisita;
 
     @ManyToOne
-    Cliente cliente;
+    private Cliente cliente;
 
 }

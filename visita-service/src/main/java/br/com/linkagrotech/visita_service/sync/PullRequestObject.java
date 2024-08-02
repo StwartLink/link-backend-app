@@ -3,7 +3,7 @@ package br.com.linkagrotech.visita_service.sync;
 import lombok.Data;
 
 @Data
-public class PullRequestRecord{
+public class PullRequestObject {
 
     /**
      * timestamp da última sincronização no dispositivo requerinte

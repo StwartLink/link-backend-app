@@ -1,10 +1,9 @@
 package br.com.linkagrotech.visita_service.controller;
 
+import br.com.linkagrotech.visita_service.model.Cliente;
 import br.com.linkagrotech.visita_service.model.Visita;
 import br.com.linkagrotech.visita_service.servico.VisitaServico;
-import br.com.linkagrotech.visita_service.sync.Changes;
-import br.com.linkagrotech.visita_service.sync.PullRequestRecord;
-import br.com.linkagrotech.visita_service.sync.PullResponseRecord;
+import br.com.linkagrotech.visita_service.sync.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,16 +20,28 @@ public class VisitaController {
     VisitaServico visitaServico;
 
     @PostMapping("/pull")
-    public ResponseEntity<PullResponseRecord> pullNovasVisitas(@RequestBody PullRequestRecord pullRequest){
+    public ResponseEntity<ChangesWrapper> pullNovasVisitas(@RequestBody PullRequestObject pullRequest){
 
-        PullResponseRecord pullResponseRecord = new PullResponseRecord();
+        ChangesWrapper changesWrapper = new ChangesWrapper();
 
-        pullResponseRecord.setTimestamp(now());
+        changesWrapper.setTimestamp(now());
 
-        pullResponseRecord.setChanges(new Changes(Map.of(Visita.TABLE_NAME,visitaServico.pull(pullRequest))));
+        if(pullRequest.getShcemaVersion()!=null)
+            visitaServico.verifySchemaCompatibility(pullRequest.getShcemaVersion());
 
-        return ResponseEntity.ok(pullResponseRecord);
+        changesWrapper.setChanges(Changes.of(visitaServico.pull(pullRequest)));
+
+        return ResponseEntity.ok(changesWrapper);
     }
+
+    @PostMapping("/push")
+    public ResponseEntity<String> pushNovasVisitas(@RequestBody ChangesWrapper changesWrapper){
+
+        Changes<?> changes = changesWrapper.getChanges();
+
+        return ResponseEntity.noContent().build();
+    }
+
 
     private long now(){
         return new Date().getTime();

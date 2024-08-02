@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.linkagrotech.userservice.dto.ExcecaoDTO;
+import br.com.linkagrotech.userservice.exception.ExcecaoDTO;
 import br.com.linkagrotech.userservice.dto.UsuarioRecord;
 import br.com.linkagrotech.userservice.repository.UsuarioRepositorio;
 import io.swagger.v3.oas.annotations.Operation;

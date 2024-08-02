@@ -17,31 +17,31 @@ public abstract class EntidadeSincronizavel {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long syncId;
+    private Long syncId;
 
     /**
      * Id gerado pelo cliente
      */
-    Long id;
+    private Long id;
 
     /**
      * Data de criação da entidade no servidor
      */
     @Column(name = "created_at")
-    Date createdAt;
+    private Date createdAt;
 
     /**
      * Data de último update no servidor
      */
     @Column(name = "updated_at")
-    Date updatedAt;
+    private Date updatedAt;
 
 
     /**
      * Data de soft-delete no servidor
      */
     @Column(name = "deleted_at")
-    Date deletedAt;
+    private Date deletedAt;
 
 
 }

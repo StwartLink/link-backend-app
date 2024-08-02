@@ -1,6 +1,6 @@
 package br.com.linkagrotech.auth_service.controller;
 
-import br.com.linkagrotech.auth_service.dto.ExcecaoDTO;
+import br.com.linkagrotech.auth_service.exception.ExcecaoDTO;
 import br.com.linkagrotech.auth_service.service.KeycloackService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +54,10 @@ public class TokenController {
             if(user.get("username").toString().equals(sendEmailRecord.username()))
                 idUser.set(user.get("id").toString());
         });
+
+        if(idUser.get().equals("")){
+            throw new Exception("Não foi possível localizar o usuário de username: "+sendEmailRecord.username);
+        }
 
         return keycloackService.executeActionEmail(idUser.get());
     }
@@ -114,11 +118,12 @@ public class TokenController {
                     entity,
                     String.class);
         } catch (HttpClientErrorException e) {
-            log.error("HttpClientErrorException: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
-            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsString());
-        } catch (Exception e) {
-            log.error("Exception: ", e);
-            return ResponseEntity.status(500).body("Internal Server Error");
+            if(e.getStatusCode().equals(HttpStatus.UNAUTHORIZED)){
+                return ResponseEntity.status(e.getStatusCode()).body(ExcecaoDTO.stringInstance("Não autorizado","Usuário não autenticado"));
+            }else{
+                return ResponseEntity.status(e.getStatusCode()).body(ExcecaoDTO.stringInstance(e));
+
+            }
         }
     }
 

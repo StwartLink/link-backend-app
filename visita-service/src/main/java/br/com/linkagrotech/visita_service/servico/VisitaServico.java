@@ -14,4 +14,6 @@ public class VisitaServico extends ServicoEntidadeSincronizavel<Visita,Long> {
         super(visitaRepositorio);
         this.visitaRepositorio = visitaRepositorio;
     }
+
+
 }

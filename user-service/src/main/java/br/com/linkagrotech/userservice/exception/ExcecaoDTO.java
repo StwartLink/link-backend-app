@@ -1,5 +1,7 @@
-package br.com.linkagrotech.auth_service.dto;
+package br.com.linkagrotech.userservice.exception;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 
 @Getter

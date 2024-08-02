@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.linkagrotech.userservice.config.SecurityConfig;
-import br.com.linkagrotech.userservice.dto.ExcecaoDTO;
+import br.com.linkagrotech.userservice.exception.ExcecaoDTO;
 import br.com.linkagrotech.userservice.dto.UsuarioRecord;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,24 +20,12 @@ import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
 
-import br.com.linkagrotech.userservice.dto.UsuarioRecord;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.BadRequestException;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 
 
 @Component
