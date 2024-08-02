@@ -50,3 +50,9 @@ springdoc:
     version: OPENAPI_3_1
   cache:
     disabled: true
+
+link-gateway-oauth:
+  issuer-uri: ${KEYCLOAK_ISSUER:http://localhost:8081/realms/agrobrasil}
+  clientId: microservices
+  clientSecret: soFh1RbL9qbWud3IHE0ox8Cxl3YZZc3K
+  keyloack-host: ${KEYCLOAK_HOST:http://localhost:8081}

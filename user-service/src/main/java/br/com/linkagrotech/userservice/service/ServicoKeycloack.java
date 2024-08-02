@@ -7,6 +7,7 @@ import br.com.linkagrotech.userservice.dto.UsuarioNovoKeycloak;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -19,7 +20,9 @@ import java.net.URI;
 @Service
 public class ServicoKeycloack {
 
-    private static final String KEYCLOAK_URL = "http://localhost:8081";
+    @Value("${link-gateway-oauth.keyloack-host}")
+    private String keycloakHost;
+
     private static final String REALM = "master";
     private static final String CLIENT_ID = "admin-cli";
     private static final String USERNAME = "admin";
@@ -39,7 +42,7 @@ public class ServicoKeycloack {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
 
-        String tokenUrl = KEYCLOAK_URL + "/realms/" + REALM + "/protocol/openid-connect/token";
+        String tokenUrl = keycloakHost + "/realms/" + REALM + "/protocol/openid-connect/token";
         ResponseEntity<String> response = restTemplate.postForEntity(tokenUrl, request, String.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
@@ -68,8 +71,8 @@ public class ServicoKeycloack {
 
         String firstName = record.getNome().split(" ")[0];
         String lastname = record.getNome().replace(firstName,"");
-
-        var responseEntity = restTemplate.postForEntity("http://localhost:8081/admin/realms/agrobrasil/users",
+        String url = keycloakHost+"/admin"+"/realms"+"/agrobrasil"+"/users";
+        var responseEntity = restTemplate.postForEntity(url,
                 new HttpEntity<>(UsuarioNovoKeycloak.builder()
                         .username(record.getUsername())
                         .email(record.getEmail())
@@ -88,7 +91,7 @@ public class ServicoKeycloack {
         RestTemplate restTemplate = new RestTemplate();
 
 
-        restTemplate.put(String.format("http://localhost:8081/admin/realms/%s/users/%s/reset-password","agrobrasil",userUUID),
+        restTemplate.put(String.format("%s/admin/realms/%s/users/%s/reset-password",keycloakHost,"agrobrasil",userUUID),
                 new HttpEntity<>(this.getCredencialRepresentation(novaSenha),headers),
                 String.class
         );
@@ -97,7 +100,7 @@ public class ServicoKeycloack {
 
     public void deletarUsuario(String userId, HttpHeaders headers) {
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.delete(String.format("http://localhost:8081/admin/realms/%s/users/%s", "agrobrasil", userId),
+        restTemplate.delete(String.format("%s/admin/realms/%s/users/%s",keycloakHost, "agrobrasil", userId),
                 new HttpEntity<>(headers),
                 String.class
         );
