@@ -5,10 +5,7 @@ import br.com.linkagrotech.auth_service.service.KeycloackService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +39,7 @@ public class TokenController {
 
 
     @PostMapping("/enviar-email-recuperacao")
-    public ResponseEntity<String> sendLinkResetPasswordEmail(@RequestBody SendEmailRecord record) throws Exception {
+    public ResponseEntity<String> sendLinkResetPasswordEmail(@RequestBody SendEmailRecord sendEmailRecord) throws Exception {
 
 
         String listaString = keycloackService.getUsers();
@@ -51,21 +48,19 @@ public class TokenController {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        LinkedList<LinkedHashMap> usuarios = objectMapper.readValue(listaString, LinkedList.class);
+        LinkedList<LinkedHashMap<?,?>> usuarios = objectMapper.readValue(listaString, LinkedList.class);
 
         usuarios.forEach(user->{
-            if(user.get("username").toString().equals(record.username()))
+            if(user.get("username").toString().equals(sendEmailRecord.username()))
                 idUser.set(user.get("id").toString());
         });
 
-        keycloackService.executeActionEmail(idUser.get());
-
-        return ResponseEntity.ok("");
+        return keycloackService.executeActionEmail(idUser.get());
     }
 
 
     @PostMapping("/refresh-token")
-    public ResponseEntity refreshToken(@RequestBody RefreshTokenRecord wrapper){
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRecord wrapper){
 
         if(wrapper.refreshToken==null || wrapper.refreshToken.equals(""))
             return ResponseEntity.badRequest().body(
