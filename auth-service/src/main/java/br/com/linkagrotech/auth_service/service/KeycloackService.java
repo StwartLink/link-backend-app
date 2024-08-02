@@ -75,7 +75,7 @@ public class KeycloackService {
         return response.getBody();
     }
 
-    public boolean executeActionEmail(String userId) throws Exception {
+    public ResponseEntity<String> executeActionEmail(String userId) throws Exception {
         String token = getToken();
         HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -93,11 +93,6 @@ public class KeycloackService {
 
         HttpEntity<String> request = new HttpEntity<>( headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.PUT, request, String.class);
-
-        if (response.getStatusCode() == HttpStatus.NO_CONTENT)
-            return true;
-
-        return false;
+        return restTemplate.exchange(uri, HttpMethod.PUT, request, String.class);
     }
 }
