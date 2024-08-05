@@ -10,6 +10,7 @@ import br.com.linkagrotech.visita_service.sync.modelo.EntidadeSincronizavel;
 import br.com.linkagrotech.visita_service.sync.modelo.PullRequestWrapper;
 import br.com.linkagrotech.visita_service.sync.repositorio.RepositorioEntidadeSincronizavel;
 import br.com.linkagrotech.visita_service.sync.util.SyncUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +54,7 @@ public class ServicoEntidadeSincronizavel {
     }
 
     @SafeVarargs
+    @Transactional
     public final void pushEntities(Changes changes, Class<? extends EntidadeSincronizavel>... classes) throws SincronizacaoException {
 
         for (Class<? extends EntidadeSincronizavel> clazz : classes) {
