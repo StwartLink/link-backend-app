@@ -1,22 +1,22 @@
-package br.com.linkagrotech.visita_service.sync;
+package br.com.linkagrotech.visita_service.sync.modelo;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
 @NoArgsConstructor
+@Data
 public class Changes {
 
-    public Map<String,Change> tableChanges;
-
-    public Changes(Map.Entry<String,Change> tableChanges){
-        this.tableChanges = Map.ofEntries(tableChanges);
-    }
+    private Map<String, Change> tableChanges;
 
 
+    /**
+     * Obtem o objeto Changes para a lista de Entrys passados.
+     * @param tableChanges
+     * @return
+     */
     @SafeVarargs
     public static  Changes of(Map.Entry<String,Change>... tableChanges){
         Changes changes = new Changes();

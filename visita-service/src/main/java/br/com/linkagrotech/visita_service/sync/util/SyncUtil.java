@@ -3,6 +3,9 @@ package br.com.linkagrotech.visita_service.sync.util;
 import jakarta.persistence.Entity;
 
 public class SyncUtil {
+
+    private SyncUtil(){}
+
     public static String obterTableNameFromEntity(Class<?> entidade) {
         Entity annotation = entidade.getAnnotation(Entity.class);
 
@@ -11,7 +14,7 @@ public class SyncUtil {
 
         String tableName = annotation.name();
 
-        if(tableName==null || tableName==""){
+        if(tableName==null || "".equals(tableName)){
             tableName = entidade.getSimpleName();
         }
         return tableName;

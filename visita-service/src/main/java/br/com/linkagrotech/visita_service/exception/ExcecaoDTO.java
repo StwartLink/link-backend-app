@@ -1,8 +1,9 @@
 package br.com.linkagrotech.visita_service.exception;
 
+import lombok.Data;
 import lombok.Getter;
 
-@Getter
+@Data
 public class ExcecaoDTO {
 
 

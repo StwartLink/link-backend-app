@@ -1,23 +1,22 @@
-package br.com.linkagrotech.visita_service.sync;
+package br.com.linkagrotech.visita_service.sync.modelo;
 
-import lombok.Data;
+import br.com.linkagrotech.visita_service.sync.modelo.Migration;
 
-@Data
-public class PullRequestObject {
+public class PullRequestWrapper {
 
     /**
      * timestamp da última sincronização no dispositivo requerinte
      */
-    Long lastPulledAt;
+    public Long lastPulledAt;
 
     /**
      * Versão atual do schema no dispositivo requerinte.
      */
-    Long shcemaVersion;
+    public Long shcemaVersion;
 
     /**
      * Objeto que encapsula informações da migration. Pode ser utilizado junto ao "shcemaVersion".
      */
-    Migration migration;
+    public Migration migration;
 
 }

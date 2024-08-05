@@ -1,7 +1,9 @@
-package br.com.linkagrotech.visita_service.sync;
+package br.com.linkagrotech.visita_service.sync.modelo;
 
+
+import br.com.linkagrotech.visita_service.sync.modelo.Change;
+import br.com.linkagrotech.visita_service.sync.modelo.Changes;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
@@ -10,21 +12,22 @@ import java.util.Map;
  * Returned raw records MUST NOT not contain special _status, _changed fields.
  * Returned raw records MAY contain fields (columns) that are not yet present in the local app (at schemaVersion -- but added in a later version). They will be safely ignored.
  */
+@Data
 public class ChangesWrapper {
 
     /**
      * Alterações realizadas
      */
-    public Changes changes;
+    private Changes changes;
 
     /**
-    * Timestamp antes logo antes de realizar a primeira consulta de "changes"
+    * Timestamp antes logo antes de realizar o pull
      */
-    public Long timestamp;
+    private Long timestamp;
 
     public void addChange(Map.Entry<String, Change> entryChange ){
 
-        changes.tableChanges.put(entryChange.getKey(),entryChange.getValue());
+        changes.getTableChanges().put(entryChange.getKey(),entryChange.getValue());
 
     }
 

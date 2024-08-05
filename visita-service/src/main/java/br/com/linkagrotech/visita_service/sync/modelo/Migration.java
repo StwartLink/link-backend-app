@@ -1,7 +1,11 @@
-package br.com.linkagrotech.visita_service.sync;
+package br.com.linkagrotech.visita_service.sync.modelo;
+
+import br.com.linkagrotech.visita_service.sync.modelo.Columns;
+import lombok.Data;
 
 import java.util.List;
 
+@Data
 public class Migration {
 
     /* *******************
@@ -13,7 +17,7 @@ public class Migration {
     /**
      * Versão do schema do aplicativo pega na última sincronização
      */
-    Long from;
+    private Long from;
 
     /* *******************
 
@@ -28,12 +32,12 @@ public class Migration {
     /**
      * Novas tabelas que foram adicionadas no aplicativo desde a última sincronização
      */
-    List<String> tables;
+    private List<String> tables;
 
 
     /**
      * Lista de objetos "Columns", que contém o par "tabela/lista de colunas alteradas da tabela"
      */
-    List<Columns> columns;
+    private List<Columns> columns;
 
 }

@@ -1,9 +1,14 @@
 package br.com.linkagrotech.visita_service.controller;
 
+import br.com.linkagrotech.visita_service.model.TipoVisita;
 import br.com.linkagrotech.visita_service.model.Visita;
 import br.com.linkagrotech.visita_service.repository.ClienteRepositorio;
-import br.com.linkagrotech.visita_service.servico.VisitaServico;
-import br.com.linkagrotech.visita_service.sync.*;
+import br.com.linkagrotech.visita_service.sync.exception.SincronizacaoException;
+import br.com.linkagrotech.visita_service.sync.exception.SincronizacaoExceptionDTO;
+import br.com.linkagrotech.visita_service.sync.modelo.Changes;
+import br.com.linkagrotech.visita_service.sync.modelo.ChangesWrapper;
+import br.com.linkagrotech.visita_service.sync.modelo.PullRequestWrapper;
+import br.com.linkagrotech.visita_service.sync.servico.ServicoEntidadeSincronizavel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,34 +21,33 @@ import java.util.Date;
 public class VisitaController {
 
     @Autowired
-    VisitaServico visitaServico;
+    ServicoEntidadeSincronizavel servicoSincronizavel;
 
     @Autowired
     ClienteRepositorio clienteRepositorio;
 
     @PostMapping("/pull")
-    public ResponseEntity<ChangesWrapper> pullNovasVisitas(@RequestBody PullRequestObject pullRequest){
+    public ResponseEntity<ChangesWrapper> pullNovasVisitas(@RequestBody PullRequestWrapper pullRequest){
 
         ChangesWrapper changesWrapper = new ChangesWrapper();
 
-        changesWrapper.timestamp = now();
+        changesWrapper.setTimestamp(now());
 
-        if(pullRequest.getShcemaVersion()!=null)
-            visitaServico.verifySchemaCompatibility(pullRequest.getShcemaVersion());
-
-        changesWrapper.changes= Changes.of(visitaServico.pullEntities(pullRequest, Visita.class));
+        changesWrapper.setChanges(servicoSincronizavel.pullEntities(pullRequest, Visita.class, TipoVisita.class));
 
         return ResponseEntity.ok(changesWrapper);
     }
 
     @PostMapping("/push")
-    public ResponseEntity<String> pushNovasVisitas(@RequestBody ChangesWrapper changesWrapper){
+    public ResponseEntity pushNovasVisitas(@RequestBody ChangesWrapper changesWrapper)  {
 
-        clienteRepositorio.obterPorFoo();
+        Changes changes = changesWrapper.getChanges();
 
-        Changes changes = changesWrapper.changes;
-
-        visitaServico.pushEntities(changes, Visita.class);
+        try {
+            servicoSincronizavel.pushEntities(changes, Visita.class, TipoVisita.class);
+        } catch (SincronizacaoException e) {
+            return ResponseEntity.internalServerError().body(new SincronizacaoExceptionDTO(e));
+        }
 
         return ResponseEntity.noContent().build();
     }
