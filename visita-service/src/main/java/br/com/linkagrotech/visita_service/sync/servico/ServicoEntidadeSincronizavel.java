@@ -16,16 +16,20 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class ServicoEntidadeSincronizavel {
 
-    @Autowired
-    private RepositorioEntidadeSincronizavel repositorioEntidadeSincronizavel;
+    private final RepositorioEntidadeSincronizavel repositorioEntidadeSincronizavel;
+
+    public ServicoEntidadeSincronizavel(RepositorioEntidadeSincronizavel repositorioEntidadeSincronizavel){
+        this.repositorioEntidadeSincronizavel = repositorioEntidadeSincronizavel;
+    }
 
 
-    @SafeVarargs
-    public final Changes pullEntities(PullRequestWrapper pullRequest, Class<? extends EntidadeSincronizavel>... classes) {
+    @Transactional
+    public Changes pullEntities(PullRequestWrapper pullRequest, List<Class<? extends EntidadeSincronizavel>> classes) {
         Changes changes = new Changes();
 
         changes.setTableChanges(new HashMap<>());
@@ -53,9 +57,8 @@ public class ServicoEntidadeSincronizavel {
      return changes;
     }
 
-    @SafeVarargs
     @Transactional
-    public final void pushEntities(Changes changes, Class<? extends EntidadeSincronizavel>... classes) throws SincronizacaoException {
+    public void pushEntities(Changes changes, List<Class<? extends EntidadeSincronizavel>> classes) throws SincronizacaoException {
 
         for (Class<? extends EntidadeSincronizavel> clazz : classes) {
 

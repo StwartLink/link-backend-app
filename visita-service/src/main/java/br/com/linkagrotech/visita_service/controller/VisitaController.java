@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 
 
 @RestController
@@ -33,7 +34,7 @@ public class VisitaController {
 
         changesWrapper.setTimestamp(now());
 
-        changesWrapper.setChanges(servicoSincronizavel.pullEntities(pullRequest, Visita.class, TipoVisita.class));
+        changesWrapper.setChanges(servicoSincronizavel.pullEntities(pullRequest, List.of(Visita.class, TipoVisita.class)));
 
         return ResponseEntity.ok(changesWrapper);
     }
@@ -44,7 +45,7 @@ public class VisitaController {
         Changes changes = changesWrapper.getChanges();
 
         try {
-            servicoSincronizavel.pushEntities(changes, Visita.class, TipoVisita.class);
+            servicoSincronizavel.pushEntities(changes, List.of(Visita.class, TipoVisita.class));
         } catch (SincronizacaoException e) {
             return ResponseEntity.internalServerError().body(new SincronizacaoExceptionDTO(e));
         }
