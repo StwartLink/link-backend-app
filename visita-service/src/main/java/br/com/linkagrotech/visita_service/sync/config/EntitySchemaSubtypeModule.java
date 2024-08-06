@@ -8,13 +8,13 @@ import org.reflections.Reflections;
 
 import java.util.Set;
 
-public class DynamicSubtypeModule extends SimpleModule {
+public class EntitySchemaSubtypeModule extends SimpleModule {
 
     public static String toSnakeCase(String input) {
         return input.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase();
     }
 
-    public DynamicSubtypeModule() {
+    public EntitySchemaSubtypeModule() {
         Reflections reflections = new Reflections("br.com.linkagrotech");
         Set<Class<? extends EntidadeSincronizavel>> subTypes = reflections.getSubTypesOf(EntidadeSincronizavel.class);
 

@@ -8,8 +8,8 @@ import lombok.Data;
 @Data
 public class TipoVisita extends EntidadeSincronizavel {
 
-    String titulo;
+    private String titulo;
 
-    String descricao;
+    private String descricao;
 
 }

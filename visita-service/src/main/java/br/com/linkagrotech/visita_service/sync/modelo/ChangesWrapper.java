@@ -1,8 +1,7 @@
 package br.com.linkagrotech.visita_service.sync.modelo;
 
 
-import br.com.linkagrotech.visita_service.sync.modelo.Change;
-import br.com.linkagrotech.visita_service.sync.modelo.Changes;
+
 import lombok.Data;
 
 import java.util.Map;
@@ -21,6 +20,11 @@ public class ChangesWrapper {
     private Changes changes;
 
     /**
+     * timestamp da última sincronização no dispositivo requerinte
+     */
+    private Long lastPulledAt;
+
+    /**
     * Timestamp antes logo antes de realizar o pull
      */
     private Long timestamp;
@@ -33,44 +37,3 @@ public class ChangesWrapper {
 
 }
 
-/*
-{
-    "changes": {
-        "tableChanges": {
-            "visita": {
-                "created": [
-                    {
-                        "type":"visita",
-                        "dispositivo": "MAC::99800.00082.3321",
-                        "syncId": null,
-                        "id": 16,
-                        "createdAt": null,
-                        "updatedAt": null,
-                        "deletedAt": null,
-                        "tipoVisita": {
-                            "descricao": "top dsaadsadsasd descricoes"
-                        },
-                        "cliente": null
-                    },
-                    {
-                        "type":"visita",
-                        "dispositivo": "MAC::99800.00082.321",
-                        "syncId": null,
-                        "id": 17,
-                        "createdAt": null,
-                        "updatedAt": null,
-                        "deletedAt": null,
-                        "tipoVisita": {
-                            "descricao": "descricao diferenciada"
-                        },
-                        "cliente": null
-                    }
-                ],
-                "updated": [],
-                "deleted": []
-            }
-        }
-    },
-    "timestamp": 1722632881023
-}
- */

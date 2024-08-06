@@ -1,17 +1,19 @@
 package br.com.linkagrotech.visita_service.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import br.com.linkagrotech.visita_service.sync.modelo.EntidadeSincronizavel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.List;
 
 @Entity(name="cliente")
 @Data
-public class Cliente {
+public class Cliente extends EntidadeSincronizavel {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    Long id;
+    String nome;
+
+    @OneToMany(mappedBy = "cliente",fetch = FetchType.LAZY)
+    List<LimiteCredito> limiteCredito;
 
 }

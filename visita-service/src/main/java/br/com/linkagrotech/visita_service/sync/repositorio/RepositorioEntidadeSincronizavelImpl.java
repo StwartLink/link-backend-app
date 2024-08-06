@@ -1,19 +1,18 @@
 package br.com.linkagrotech.visita_service.sync.repositorio;
 
+import br.com.linkagrotech.visita_service.sync.EntidadeSincronizavelUtils;
 import br.com.linkagrotech.visita_service.sync.modelo.EntidadeSincronizavel;
 import br.com.linkagrotech.visita_service.sync.exception.SincronizacaoException;
 import br.com.linkagrotech.visita_service.sync.exception.TipoSincronizacaoErro;
 import br.com.linkagrotech.visita_service.sync.util.SyncUtil;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public class RepositorioEntidadeSincronizavelImpl implements RepositorioEntidadeSincronizavel{
@@ -21,12 +20,12 @@ public class RepositorioEntidadeSincronizavelImpl implements RepositorioEntidade
     @PersistenceContext
     EntityManager entityManager;
 
-    private EntidadeSincronizavel findBySyncId(Long id, Class<? extends EntidadeSincronizavel> entidade){
+    private EntidadeSincronizavel findById(Long id, Class<? extends EntidadeSincronizavel> entidade){
 
         String tableName = SyncUtil.obterTableNameFromEntity(entidade);
 
         var query = entityManager.createQuery("select e from " + tableName + " e "
-                + "where e.syncId > :id",entidade
+                + "where e.id > :id",entidade
         );
 
         query.setParameter("id",id);
@@ -49,76 +48,80 @@ public class RepositorioEntidadeSincronizavelImpl implements RepositorioEntidade
         String tableName = SyncUtil.obterTableNameFromEntity(entidade);
 
         var query = entityManager.createQuery("select e from " + tableName + " e "
-        + "where e.createdAt > :lastPulledAt"
+        + "where e.createdAt > :lastPulledAt",EntidadeSincronizavel.class
         );
 
-        query.setParameter("lastPulledAt",new Date(lastPulledAt));
+        query.setParameter("lastPulledAt", Instant.ofEpochMilli(lastPulledAt));
 
-        return query.getResultList();
+        var createdsSince = query.getResultList();
+
+        createdsSince.forEach(EntidadeSincronizavelUtils::preencherValoresTransientes);
+
+        return createdsSince;
     }
 
     @Override
     public List<EntidadeSincronizavel> obterUpdatedSince(Long lastPulledAt, Class<? extends EntidadeSincronizavel> entidade) {
+
         String tableName = SyncUtil.obterTableNameFromEntity(entidade);
 
-        var query = entityManager.createQuery("select e from " + tableName + " e "
-                + "where e.updatedAt > :lastPulledAt"
-        );
+        var query = entityManager.createQuery("select e from " + tableName + " e " + "where e.updatedAt > :lastPulledAt",
+                EntidadeSincronizavel.class);
 
-        query.setParameter("lastPulledAt",new Date(lastPulledAt));
+        query.setParameter("lastPulledAt",Instant.ofEpochMilli(lastPulledAt));
 
-        return query.getResultList();
+        var createdsSince = query.getResultList();
+
+        createdsSince.forEach(EntidadeSincronizavelUtils::preencherValoresTransientes);
+
+        return createdsSince;
     }
 
     @Override
-    public List<String> obterDeletedSince(Long lastPulledAt, Class<? extends EntidadeSincronizavel> entidade) {
+    public List<UUID> obterDeletedSince(Long lastPulledAt, Class<? extends EntidadeSincronizavel> entidade) {
 
         String tableName = SyncUtil.obterTableNameFromEntity(entidade);
 
-        var query = entityManager.createQuery("select e.syncId from " + tableName + " e "
+        var query = entityManager.createQuery("select e.id from " + tableName + " e "
                 + "where e.deletedAt > :lastPulledAt"
         );
 
-        query.setParameter("lastPulledAt",new Date(lastPulledAt));
+        query.setParameter("lastPulledAt",Instant.ofEpochMilli(lastPulledAt));
 
-        List<?> resultList = query.getResultList();
+        List<UUID> resultList = query.getResultList();
 
-       return resultList.stream().map(String::valueOf).toList();
+       return resultList;
     }
 
     @Override
     @Transactional
-    public void salvarSincronizaveis(List<EntidadeSincronizavel> sincronizaveis, Class< ? extends  EntidadeSincronizavel> clazz) {
+    public void salvarSincronizaveis(List<EntidadeSincronizavel> sincronizaveis, Class< ? extends  EntidadeSincronizavel> clazz) throws SincronizacaoException {
+
         String tableName = SyncUtil.obterTableNameFromEntity(clazz);
 
-        List<Long> ids = sincronizaveis.stream().map(EntidadeSincronizavel::getId).toList();
-
-        List<String> dispositivos = sincronizaveis.stream().map(EntidadeSincronizavel::getDispositivo).toList();
-
-        //definição de alguém já estar dentro:
-        // mesmo id (mobile) e mesmo dispositivo.
-        //quero: todos os registros que têm algum par id<->dispositivo, o qual id pertença à [...] e dispositivo à [...]
-        // além disso, preciso que cada linha tenha pares válidos
+        List<UUID> ids = sincronizaveis.stream().map(EntidadeSincronizavel::getId).toList();
 
         TypedQuery<EntidadeSincronizavel> query = entityManager.createQuery(
                 "select e from "
                         +tableName+
-                        " e where e.id in :ids and e.dispositivo in :dispositivos",
+                        " e where e.id in :ids ",
                 EntidadeSincronizavel.class
         );
 
         query.setParameter("ids",ids);
 
-        query.setParameter("dispositivos",dispositivos);
-
+        //entidades que já foram sincronizadas, mas o front/mobile não sabe que foram ainda e por isso ele está requerindo para salvar novamente
+        //nesse caso, é realizado um "update"
         List<EntidadeSincronizavel> entidadesJaExistentes = query.getResultList();
 
         sincronizaveis.forEach(newEntity -> {
 
-            var projecoes = entidadesJaExistentes.stream().filter(dto -> match(newEntity.getId(),newEntity.getDispositivo() , dto)).toList();
+            var projecoes = entidadesJaExistentes.stream().filter(dto -> match(newEntity.getId(), dto)).toList();
+
             if (projecoes.isEmpty()) {
                 // nao existe projeção no banco, ou seja, a entidade realmente não foi persistida
-                entityManager.persist(newEntity);
+                EntidadeSincronizavelUtils.preencherRelacoes(newEntity);
+                entityManager.merge(newEntity);
             } else {
                 // existe projeção da entidade a ser criada no banco, ou seja, ela já foi persistida, e o cliente tenta refazer
                 // a operação
@@ -126,7 +129,7 @@ public class RepositorioEntidadeSincronizavelImpl implements RepositorioEntidade
 
                 newEntity.setCreatedAt(projecao.getCreatedAt());
 
-                newEntity.setSyncId(projecao.getSyncId());
+                EntidadeSincronizavelUtils.preencherRelacoes(newEntity);
 
                 entityManager.merge(newEntity);
             }
@@ -135,7 +138,7 @@ public class RepositorioEntidadeSincronizavelImpl implements RepositorioEntidade
 
     /**
      * Atualiza a lista de entidades sincronizáveis.
-     * É esperado que elas possuam já um syncId, visto que já foram criadas.
+     * É esperado que elas possuam já uma entidade no banco, visto que já foram criadas.
      *
      * @param updateds
      * @param clazz
@@ -146,38 +149,37 @@ public class RepositorioEntidadeSincronizavelImpl implements RepositorioEntidade
 
         String tableName = SyncUtil.obterTableNameFromEntity(clazz);
 
-        /*
-        ID que veio para atualizar não existe no banco:
-        1: A entidade de ID a atualizar foi deletada e não pode mais ser atualizada --> Exception
-        2: Só existirá soft delete no sistema é, então ela deve ser criada para manter a uniformidade na sincronização
-        */
 
-        List<Long> syncIdsParaAtualizar = updateds.stream().map(EntidadeSincronizavel::getSyncId).toList();
+        List<UUID> idsParaAtualizar = updateds.stream().map(EntidadeSincronizavel::getId).toList();
 
         TypedQuery<EntidadeSincronizavel> query = entityManager.createQuery(
-                "select e from " +tableName+ " e where e.syncId in :syncIds",
+                "select e from " +tableName+ " e where e.id in :ids",
                 EntidadeSincronizavel.class
         );
 
-        query.setParameter("syncIds",syncIdsParaAtualizar);
+        query.setParameter("ids",idsParaAtualizar);
 
-        List<EntidadeSincronizavel> entidadesNoBanco = query.getResultList();
+        List<EntidadeSincronizavel> entidadeAtualizarNoBanco = query.getResultList();
 
-        List<Long> syncIdsNoBanco = entidadesNoBanco.stream().map(EntidadeSincronizavel::getSyncId).toList();
+        List<UUID> idsAtualizarNoBanco = entidadeAtualizarNoBanco.stream().map(EntidadeSincronizavel::getId).toList();
 
-        List<Long> syncIdsFantasmas =  syncIdsParaAtualizar.stream().filter(idAtualizar->!syncIdsNoBanco.contains(idAtualizar)).toList();
+        List<UUID> idsFantasmas =  idsParaAtualizar.stream().filter(idAtualizar->!idsAtualizarNoBanco.contains(idAtualizar)).toList();
 
-        List<EntidadeSincronizavel> syncEntidadesSoftDeletados =  entidadesNoBanco.stream().filter(e-> e.getDeletedAt()!=null).toList();
+        List<EntidadeSincronizavel> entidadesSoftDeletadas =  entidadeAtualizarNoBanco.stream().filter(e-> e.getDeletedAt()!=null).toList();
 
-        if(!syncIdsFantasmas.isEmpty()){
-            throw new SincronizacaoException(TipoSincronizacaoErro.UPDATE_INVALIDO_ID_INEXISTENTE, updateds.stream().filter(u->syncIdsFantasmas.contains(u.getSyncId())).toList());
+        if(!idsFantasmas.isEmpty()){
+            throw new SincronizacaoException(TipoSincronizacaoErro.UPDATE_INVALIDO_ID_INEXISTENTE, updateds.stream().filter(u->idsFantasmas.contains(u.getId())).toList());
         }
 
-        if(!syncEntidadesSoftDeletados.isEmpty()){
-            throw new SincronizacaoException( TipoSincronizacaoErro.UPDATE_INVALIDO_ID_SOFT_DELETADO, syncEntidadesSoftDeletados);
+        if(!entidadesSoftDeletadas.isEmpty()){
+            throw new SincronizacaoException( TipoSincronizacaoErro.UPDATE_INVALIDO_ID_SOFT_DELETADO, entidadesSoftDeletadas);
         }
+
 
         for (EntidadeSincronizavel entidadeSincronizavel : updateds) {
+
+            EntidadeSincronizavelUtils.preencherRelacoes(entidadeSincronizavel);
+
             entityManager.merge(entidadeSincronizavel);
         }
 
@@ -185,21 +187,58 @@ public class RepositorioEntidadeSincronizavelImpl implements RepositorioEntidade
 
     @Override
     @Transactional
-    public void deletarSincronizaveis(List<String> deleted, Class<? extends EntidadeSincronizavel> clazz) {
+    public void deletarSincronizaveis(List<UUID> deleted, Class<? extends EntidadeSincronizavel> clazz) {
 
         String tableName = SyncUtil.obterTableNameFromEntity(clazz);
 
         Query query = entityManager.createQuery("update "+tableName + " e set e.deletedAt = :deletedAt where " +
-                "e.syncId in :syncIdList and e.deletedAt IS NULL");
+                "e.id in :idList and e.deletedAt IS NULL");
 
-        query.setParameter("deletedAt", new Date());
+        query.setParameter("deletedAt", Instant.now());
 
-        query.setParameter("syncIdList",deleted.stream().map(Long::valueOf).toList());
+        query.setParameter("idList",deleted);
 
         query.executeUpdate();
     }
 
-    public boolean match(Long id, String dispositivo, EntidadeSincronizavel entidadeSincronizavel){
-        return id.equals(entidadeSincronizavel.getId()) && dispositivo.equals(entidadeSincronizavel.getDispositivo());
+    @Override
+    public void verificarConflitoUpdate(List<EntidadeSincronizavel> updates, Long lastPulledAt, Class<? extends EntidadeSincronizavel> clazz) throws SincronizacaoException {
+
+        var query = getConflituosoQuery(updates.stream().map(EntidadeSincronizavel::getId).toList(),lastPulledAt,clazz);
+
+        var conflituososComListaUpdates = query.getResultList();
+
+        if(!conflituososComListaUpdates.isEmpty()){
+            throw new SincronizacaoException(TipoSincronizacaoErro.UPDATE_CONFLITUOSO, conflituososComListaUpdates);
+        }
+
+    }
+
+
+
+    @Override
+    public void verificarConflitoDeletar(List<UUID> deleted, Long lastPulledAt, Class<? extends EntidadeSincronizavel> clazz) throws SincronizacaoException {
+
+        var query = getConflituosoQuery(deleted,lastPulledAt,clazz);
+
+        var conflituososComListaUpdates = query.getResultList();
+
+        if(!conflituososComListaUpdates.isEmpty()){
+            throw new SincronizacaoException(TipoSincronizacaoErro.DELETE_CONFLITUOSO, conflituososComListaUpdates);
+        }
+
+    }
+
+
+    private boolean match(UUID id, EntidadeSincronizavel entidadeSincronizavel){
+        return id.equals(entidadeSincronizavel.getId());
+    }
+
+    private  TypedQuery<EntidadeSincronizavel> getConflituosoQuery(List<UUID> idList, Long lastPulledAt, Class<? extends EntidadeSincronizavel> clazz ){
+        String tableName = SyncUtil.obterTableNameFromEntity(clazz);
+        TypedQuery<EntidadeSincronizavel> query = entityManager.createQuery("select e from " + tableName + " e where e.updatedAt> :lastPulledAt and e.id in :idList",EntidadeSincronizavel.class);
+        query.setParameter("lastPulledAt",Instant.ofEpochMilli(lastPulledAt));
+        query.setParameter("idList",idList);
+        return query;
     }
 }

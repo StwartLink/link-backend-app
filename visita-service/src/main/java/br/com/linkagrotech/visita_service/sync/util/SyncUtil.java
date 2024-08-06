@@ -1,6 +1,11 @@
 package br.com.linkagrotech.visita_service.sync.util;
 
+import br.com.linkagrotech.visita_service.sync.modelo.annotations.VersaoSchema;
+import br.com.linkagrotech.visita_service.sync.modelo.EntidadeSincronizavel;
 import jakarta.persistence.Entity;
+import org.reflections.Reflections;
+
+import java.util.Set;
 
 public class SyncUtil {
 
@@ -18,5 +23,21 @@ public class SyncUtil {
             tableName = entidade.getSimpleName();
         }
         return tableName;
+    }
+
+    public static Set<Class<? extends EntidadeSincronizavel>> obterClassesSincronizaveis(){
+        Reflections reflections = new Reflections("br.com.linkagrotech");
+        return reflections.getSubTypesOf(EntidadeSincronizavel.class);
+    }
+
+    public static long obterSchemaVersion(Class<? extends EntidadeSincronizavel> clazz) {
+
+        if (clazz.isAnnotationPresent(VersaoSchema.class)) {
+            VersaoSchema schemaVersion = clazz.getAnnotation(VersaoSchema.class);
+            return schemaVersion.versao();
+        }
+
+        return 0L;
+
     }
 }

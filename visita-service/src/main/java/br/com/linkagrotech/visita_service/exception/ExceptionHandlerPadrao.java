@@ -1,5 +1,8 @@
 package br.com.linkagrotech.visita_service.exception;
 
+import br.com.linkagrotech.visita_service.sync.exception.SincronizacaoExceptionDTO;
+import br.com.linkagrotech.visita_service.sync.exception.TipoSincronizacaoErro;
+import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -18,6 +21,13 @@ public class ExceptionHandlerPadrao {
     public ResponseEntity<ExcecaoDTO> handleException(Exception e){
 
         return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ExcecaoDTO(e));
+    }
+
+    @ExceptionHandler(InvalidTypeIdException.class)
+    public ResponseEntity<SincronizacaoExceptionDTO> handleFaltaDoTypeExceptions(InvalidTypeIdException ex) {
+
+       return ResponseEntity.internalServerError().body( new SincronizacaoExceptionDTO(TipoSincronizacaoErro.CAMPO_TYPE_FALTANDO));
+
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -17,6 +17,9 @@ public class ReferenciaERP {
 
     private String valor;
 
+    private TipoReferencia tipoReferencia;
+
+
     @ManyToOne
     Usuario usuario;
 
